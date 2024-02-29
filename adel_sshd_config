@@ -1,0 +1,66 @@
+## Use a non-privileged port
+Port 2022
+
+## provide the new path containing these host keys
+HostKey /opt/ssh/keys/ssh_host_rsa_key
+HostKey /opt/ssh/keys/ssh_host_ecdsa_key
+HostKey /opt/ssh/keys/ssh_host_ed25519_key
+
+## Enable DEBUG log 
+LogLevel DEBUG3
+
+# Change to no to disable s/key passwords
+ChallengeResponseAuthentication no
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the ChallengeResponseAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via ChallengeResponseAuthentication may bypass
+# the setting of "PermitRootLogin without-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and ChallengeResponseAuthentication to 'no'.
+# WARNING: 'UsePAM no' is not supported in RHEL and may cause several
+# problems.
+UsePAM yes
+
+# It is recommended to use pam_motd in /etc/pam.d/sshd instead of PrintMotd,
+# as it is more configurable and versatile than the built-in version.
+PrintMotd no
+
+## Provide a path to store PID file which is accessible by normal user for write purpose
+PidFile /opt/ssh/sshd.pid
+
+# Logging
+#SyslogFacility AUTHPRIV
+
+# Limited access
+PermitRootLogin no
+X11Forwarding no
+AllowTcpForwarding no
+
+# The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
+# but this is overridden so installations will only check .ssh/authorized_keys
+AuthorizedKeysFile .ssh/authorized_keys
+
+# To disable tunneled clear text passwords, change to no here!
+PasswordAuthentication yes
+
+# GSSAPI options
+GSSAPIAuthentication yes
+GSSAPICleanupCredentials no
+
+# Accept locale-related environment variables
+AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
+AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
+AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
+AcceptEnv XMODIFIERS
+
+Subsystem sftp internal-sftp
+
+# Force sftp and chroot jail
+Match Group adel
+  ForceCommand internal-sftp
+  ChrootDirectory %h 
+
